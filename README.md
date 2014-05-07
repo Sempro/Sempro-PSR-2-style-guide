@@ -366,11 +366,11 @@ $foo->bar(
 ```php
 <?php
 $image = new Image(
-			array(
-				'filename' => $localFilename,
-				'description' => Input::get('description'),
-				'status' => 'approved',
-			)
+    array(
+        'filename' => $localFilename,
+        'description' => Input::get('description'),
+        'status' => 'approved',
+    )
 );
 ```
 
