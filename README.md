@@ -385,6 +385,17 @@ Route::post(
 );
 ```
 
+```php
+<?php
+$userdata = array(
+    'username' => 'ecrmnn',
+    'password' => Hash::make('password')
+);
+
+$user = new User($userdata));
+$user->save();
+```
+
 5. Control Structures
 ---------------------
 
