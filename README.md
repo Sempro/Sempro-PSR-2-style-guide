@@ -376,10 +376,13 @@ $image = new Image(
 
 ```php
 <?php
-Route::post('create', array(
-    'as' => 'facebook.photo.store',
-    'uses' => 'FacebookPhotoController@store'
-));
+Route::post(
+    'create',
+    array(
+        'as' => 'facebook.photo.store',
+        'uses' => 'FacebookPhotoController@store'
+    )
+);
 ```
 
 5. Control Structures
