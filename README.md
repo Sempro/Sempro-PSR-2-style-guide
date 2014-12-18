@@ -1,8 +1,6 @@
 Coding Style Guide
 ==================
 
-## Obligatorisk PHP style guide f.o.m. 19. mai 2014 - Alle prosjekter
-
 This guide extends and expands on [PSR-1], the basic coding standard.
 
 The intent of this guide is to reduce cognitive friction when scanning code
