@@ -631,7 +631,223 @@ $foo->bar(
 ```
 
 
-7. Conclusion
+7. Models
+-----------
+
+Models in laravel projects should be structured in a way that allows us to always have a common structure across repositories.
+
+Properties in a model should be defined at the top of the model. All methods in a model should be split into sections where each section has a large comment block attached.
+
+The order of methods should be:
+
+- Attributes / Accessors
+- Scopes
+- Mutators
+- Relationships
+
+### Example
+
+```php
+<?php
+
+namespace App;
+
+use App\Traits\Entities\MobileTrait;
+use App\Traits\Entities\WebsiteTrait;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class Dealer extends Model
+{
+    use SoftDeletes, MobileTrait, WebsiteTrait;
+
+    protected $table = 'dealers';
+    protected $guarded = ['id'];
+    protected $dates = ['deleted_at'];
+
+    protected static $siteIdModels = [
+        'MesterhusDealer' => 1,
+        'SystemhusDealer' => 2
+    ];
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+
+        self::saving(
+            function ($model) {
+                $model->uuid = str_random(2) . time() . str_random(6) . rand(100, 999);
+            }
+        );
+    }
+
+    protected static function getSiteId($siteName)
+    {
+        return self::$siteIdModels[$siteName];
+    }
+
+    /*
+    |-------------------------------------------------------------------------------------------------------------------
+    | Scopes
+    |-------------------------------------------------------------------------------------------------------------------
+    */
+
+    public function scopeSearch($eloquentQuery, $searchQuery)
+    {
+        return $eloquentQuery
+            ->whereNested(
+                function ($q) use ($searchQuery) {
+                    $q->where('name', 'LIKE', '%' . $searchQuery . '%');
+                    $q->orWhere('mobile', 'LIKE', '%' . $searchQuery . '%');
+                }
+            );
+    }
+
+    public function scopeOffers($query, $nameOfService)
+    {
+        $scope = 'scopeOffers' . ucfirst(strtolower($nameOfService));
+
+        return $this->{$scope}($query);
+    }
+
+    public function scopeOffersConstruction($query)
+    {
+        return $query->where('construction_mobile', '!=', '')->where('construction_email', '!=', '');
+    }
+
+    public function scopeOffersCabin($query)
+    {
+        return $query->where('cabin_mobile', '!=', '')->where('cabin_email', '!=', '');
+    }
+
+    public function scopeOffersRenovation($query)
+    {
+        return $query->where('renovation_mobile', '!=', '')->where('renovation_email', '!=', '');
+    }
+
+    public function scopeNoTestdealers($query)
+    {
+        return $query->where('test_dealer', '=', false);
+    }
+
+    /*
+    |-------------------------------------------------------------------------------------------------------------------
+    | Mutators
+    |-------------------------------------------------------------------------------------------------------------------
+    */
+
+    public function resolveRelatedModel()
+    {
+        $entitiy = app('App\\' . array_flip(self::$siteIdModels)[$this->site_id]);
+
+        return $entitiy->findOrFail($this->id);
+    }
+
+    /**
+     * Gets the corresponding mobile number to @var $nameOfService
+     * This is used when sending SMS messages to a dealer and we
+     * only know the name of the service a lead project wants,
+     * but not which mobile number we should send to
+     * @param $nameOfService
+     * @return mixed
+     */
+    public function getMobileByService($nameOfService)
+    {
+        $field = strtolower($nameOfService) . '_mobile';
+
+        return $this->{$field};
+    }
+
+    /**
+     * Gets the corresponding email to @var $nameOfService
+     * This is used when sending email to a dealer and we
+     * only know the name of the service a lead project wants,
+     * but not which email we should send to
+     * @param $nameOfService
+     * @return mixed
+     */
+    public function getEmailByService($nameOfService)
+    {
+        $field = strtolower($nameOfService) . '_email';
+
+        return $this->{$field};
+    }
+
+    public function isSalesOffice()
+    {
+        return $this->sales_office;
+    }
+
+    /*
+    |-------------------------------------------------------------------------------------------------------------------
+    | Relationships
+    |-------------------------------------------------------------------------------------------------------------------
+    */
+
+    public function site()
+    {
+        return $this->belongsTo(__NAMESPACE__ . '\Site');
+    }
+
+    public function municipality()
+    {
+        return $this->belongsTo(__NAMESPACE__ . '\Municipality');
+    }
+
+    public function leadProjects()
+    {
+        return $this->hasMany(__NAMESPACE__ . '\LeadProject');
+    }
+
+    public function fieldProjects()
+    {
+        return $this->hasMany(__NAMESPACE__ . '\FieldProject');
+    }
+
+    public function counties()
+    {
+        return $this->belongsToMany(__NAMESPACE__ . '\County', 'dealer_counties', 'dealer_id');
+    }
+
+    public function marketAreas()
+    {
+        return $this->belongsToMany(__NAMESPACE__ . '\DealerMarketArea', 'dealer_market_areas_pivot')->withTimestamps();
+    }
+
+    public function users()
+    {
+        return $this->hasMany(__NAMESPACE__ . '\User');
+    }
+
+    public function dealers()
+    {
+        return $this->hasMany(__NAMESPACE__ . '\Dealer', 'sales_office_id');
+    }
+
+    public function salesOffice()
+    {
+        return $this->belongsTo(__NAMESPACE__ . '\Dealer');
+    }
+
+    public function finnAccounts()
+    {
+        return $this->morphMany(FinnAccount::class, 'finn_accountable');
+    }
+    
+    public function finnAds()
+    {
+        return $this->hasMany(FinnAd::class);
+    }
+
+    public function logo()
+    {
+        return $this->belongsTo(Image::class, 'logo_image_id');
+    }
+}
+```
+
+
+8. Conclusion
 --------------
 
 There are many elements of style and practice intentionally omitted by this
