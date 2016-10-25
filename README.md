@@ -640,7 +640,7 @@ Properties in a model should be defined at the top of the model. All methods in 
 
 The order of methods should be:
 
-- Attributes / Accessors
+- Attributes
 - Scopes
 - Mutators
 - Relationships
