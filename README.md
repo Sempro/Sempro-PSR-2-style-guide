@@ -786,47 +786,47 @@ class Dealer extends Model
 
     public function site()
     {
-        return $this->belongsTo(__NAMESPACE__ . '\Site');
+        return $this->belongsTo(Site::class);
     }
 
     public function municipality()
     {
-        return $this->belongsTo(__NAMESPACE__ . '\Municipality');
+        return $this->belongsTo(Municipality::class);
     }
 
     public function leadProjects()
     {
-        return $this->hasMany(__NAMESPACE__ . '\LeadProject');
+        return $this->hasMany(LeadProject::class);
     }
 
     public function fieldProjects()
     {
-        return $this->hasMany(__NAMESPACE__ . '\FieldProject');
+        return $this->hasMany(FieldProject::class);
     }
 
     public function counties()
     {
-        return $this->belongsToMany(__NAMESPACE__ . '\County', 'dealer_counties', 'dealer_id');
+        return $this->belongsToMany(County::class, 'dealer_counties', 'dealer_id');
     }
 
     public function marketAreas()
     {
-        return $this->belongsToMany(__NAMESPACE__ . '\DealerMarketArea', 'dealer_market_areas_pivot')->withTimestamps();
+        return $this->belongsToMany(DealerMarketArea::class, 'dealer_market_areas_pivot')->withTimestamps();
     }
 
     public function users()
     {
-        return $this->hasMany(__NAMESPACE__ . '\User');
+        return $this->hasMany(User::class);
     }
 
     public function dealers()
     {
-        return $this->hasMany(__NAMESPACE__ . '\Dealer', 'sales_office_id');
+        return $this->hasMany(Dealer::class, 'sales_office_id');
     }
 
     public function salesOffice()
     {
-        return $this->belongsTo(__NAMESPACE__ . '\Dealer');
+        return $this->belongsTo(Dealer::class);
     }
 
     public function finnAccounts()
