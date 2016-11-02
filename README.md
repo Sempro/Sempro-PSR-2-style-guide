@@ -846,8 +846,13 @@ class Dealer extends Model
 }
 ```
 
+8. Conditional statements VS Switch statements
+----------------------------------------------
 
-8. Conclusion
+Always choose conditional statements over switch statements.
+Performance is not a concern here, but readability is.
+
+9. Conclusion
 --------------
 
 There are many elements of style and practice intentionally omitted by this
