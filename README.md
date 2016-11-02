@@ -710,26 +710,6 @@ class Dealer extends Model
         return $this->{$scope}($query);
     }
 
-    public function scopeOffersConstruction($query)
-    {
-        return $query->where('construction_mobile', '!=', '')->where('construction_email', '!=', '');
-    }
-
-    public function scopeOffersCabin($query)
-    {
-        return $query->where('cabin_mobile', '!=', '')->where('cabin_email', '!=', '');
-    }
-
-    public function scopeOffersRenovation($query)
-    {
-        return $query->where('renovation_mobile', '!=', '')->where('renovation_email', '!=', '');
-    }
-
-    public function scopeNoTestdealers($query)
-    {
-        return $query->where('test_dealer', '=', false);
-    }
-
     /*
     |-------------------------------------------------------------------------------------------------------------------
     | Mutators
@@ -758,26 +738,6 @@ class Dealer extends Model
         return $this->{$field};
     }
 
-    /**
-     * Gets the corresponding email to @var $nameOfService
-     * This is used when sending email to a dealer and we
-     * only know the name of the service a lead project wants,
-     * but not which email we should send to
-     * @param $nameOfService
-     * @return mixed
-     */
-    public function getEmailByService($nameOfService)
-    {
-        $field = strtolower($nameOfService) . '_email';
-
-        return $this->{$field};
-    }
-
-    public function isSalesOffice()
-    {
-        return $this->sales_office;
-    }
-
     /*
     |-------------------------------------------------------------------------------------------------------------------
     | Relationships
@@ -793,57 +753,8 @@ class Dealer extends Model
     {
         return $this->belongsTo(Municipality::class);
     }
-
-    public function leadProjects()
-    {
-        return $this->hasMany(LeadProject::class);
-    }
-
-    public function fieldProjects()
-    {
-        return $this->hasMany(FieldProject::class);
-    }
-
-    public function counties()
-    {
-        return $this->belongsToMany(County::class, 'dealer_counties', 'dealer_id');
-    }
-
-    public function marketAreas()
-    {
-        return $this->belongsToMany(DealerMarketArea::class, 'dealer_market_areas_pivot')->withTimestamps();
-    }
-
-    public function users()
-    {
-        return $this->hasMany(User::class);
-    }
-
-    public function dealers()
-    {
-        return $this->hasMany(Dealer::class, 'sales_office_id');
-    }
-
-    public function salesOffice()
-    {
-        return $this->belongsTo(Dealer::class);
-    }
-
-    public function finnAccounts()
-    {
-        return $this->morphMany(FinnAccount::class, 'finn_accountable');
-    }
-    
-    public function finnAds()
-    {
-        return $this->hasMany(FinnAd::class);
-    }
-
-    public function logo()
-    {
-        return $this->belongsTo(Image::class, 'logo_image_id');
-    }
 }
+
 ```
 
 8. Conditional statements VS Switch statements
@@ -852,7 +763,35 @@ class Dealer extends Model
 Always choose conditional statements over switch statements.
 Performance is not a concern here, but readability is.
 
-9. Conclusion
+9. Naming Conventions
+---------
+
+### 9a. Controller Naming
+
+Controllers should always use the singular form of the resource you are working with.
+The only exce
+**Correct:** PageController
+**Wrong:** PagesController
+**Correct:** EmployeeController
+**Wrong:** EmployeesController
+
+### 9b. Controller Method Naming
+Try  to only use the following method names in a controller
+``index, create, store, edit, update, delete``
+
+If you find yourself in a situation where you have a ``PageController`` with all the methods above, but want to add an ``updateOrder`` method, you should instead make a dedicated controller ``PageOrderController`` with an ``update`` method.
+
+### 9c. Route aliases
+Should always be ``resource.method``
+
+Example: A route to the ``update`` method on a ``PageController`` should be aliased to ``page.update``
+
+### 9d. FormRequest
+Should always be ``[Method][Resource]Request``.
+**Correct:** ``StorePageRequest`` ``UpdatePageRequest`` ``DeletePageRequest``
+
+
+10. Conclusion
 --------------
 
 There are many elements of style and practice intentionally omitted by this
