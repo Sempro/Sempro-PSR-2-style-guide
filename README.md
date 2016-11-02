@@ -769,15 +769,16 @@ Performance is not a concern here, but readability is.
 ### 9a. Controller Naming
 
 Controllers should always use the singular form of the resource you are working with.
-The only exce
-**Correct:** PageController
-**Wrong:** PagesController
-**Correct:** EmployeeController
-**Wrong:** EmployeesController
+
+- **Correct:** PageController
+- **Wrong:** PagesController
+- **Correct:** EmployeeController
+- **Wrong:** EmployeesController
 
 ### 9b. Controller Method Naming
 Try  to only use the following method names in a controller
 ``index, create, store, edit, update, delete``
+
 
 If you find yourself in a situation where you have a ``PageController`` with all the methods above, but want to add an ``updateOrder`` method, you should instead make a dedicated controller ``PageOrderController`` with an ``update`` method.
 
@@ -788,6 +789,8 @@ Example: A route to the ``update`` method on a ``PageController`` should be alia
 
 ### 9d. FormRequest
 Should always be ``[Method][Resource]Request``.
+
+
 **Correct:** ``StorePageRequest`` ``UpdatePageRequest`` ``DeletePageRequest``
 
 
