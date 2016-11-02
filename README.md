@@ -778,6 +778,7 @@ Controllers should always use the singular form of the resource you are working 
 ### 9b. Controller Method Naming
 Try  to only use the following method names in a controller
 ``index, create, store, show, edit, update, delete``
+This order of methods is also recommended.
 
 
 If you find yourself in a situation where you have a ``PageController`` with all the methods above, but want to add an ``updateOrder`` method, you should instead make a dedicated controller ``PageOrderController`` with an ``update`` method.
