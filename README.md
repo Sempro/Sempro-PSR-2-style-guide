@@ -781,7 +781,7 @@ Try  to only use the following method names in a controller
 This order of methods is also recommended.
 
 
-If you find yourself in a situation where you have a ``PageController`` with all the methods above, but want to add an ``updateOrder`` method, you should instead make a dedicated controller ``PageOrderController`` with an ``update`` method.
+~~If you find yourself in a situation where you have a ``PageController`` with all the methods above, but want to add an ``updateOrder`` method, you should instead make a dedicated controller ``PageOrderController`` with an ``update`` method.~~
 
 ### 9c. Route aliases
 Should always be ``resource.method``
