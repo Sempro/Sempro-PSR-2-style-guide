@@ -640,9 +640,10 @@ Properties in a model should be defined at the top of the model. All methods in 
 
 The order of methods should be:
 
-- Attributes
-- Scopes
+- Accessors
 - Mutators
+- Scopes
+- Methods
 - Relationships
 
 ### Example
@@ -652,62 +653,28 @@ The order of methods should be:
 
 namespace App;
 
-use App\Traits\Entities\MobileTrait;
-use App\Traits\Entities\WebsiteTrait;
+use App\Traits\Entities\Publishable;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Dealer extends Model
+class Page extends Model
 {
-    use SoftDeletes, MobileTrait, WebsiteTrait;
+    use Publishable;
 
-    protected $table = 'dealers';
+    protected $table = 'pages';
+
     protected $guarded = ['id'];
-    protected $dates = ['deleted_at'];
 
-    protected static $siteIdModels = [
-        'MesterhusDealer' => 1,
-        'SystemhusDealer' => 2
-    ];
-
-    public function __construct(array $attributes = [])
-    {
-        parent::__construct($attributes);
-
-        self::saving(
-            function ($model) {
-                $model->uuid = str_random(2) . time() . str_random(6) . rand(100, 999);
-            }
-        );
-    }
-
-    protected static function getSiteId($siteName)
-    {
-        return self::$siteIdModels[$siteName];
-    }
+    protected $dates = ['published_at', 'updated_at', 'created_at'];
 
     /*
     |-------------------------------------------------------------------------------------------------------------------
-    | Scopes
+    | Accessors
     |-------------------------------------------------------------------------------------------------------------------
     */
 
-    public function scopeSearch($eloquentQuery, $searchQuery)
+    public function getIconAttribute()
     {
-        return $eloquentQuery
-            ->whereNested(
-                function ($q) use ($searchQuery) {
-                    $q->where('name', 'LIKE', '%' . $searchQuery . '%');
-                    $q->orWhere('mobile', 'LIKE', '%' . $searchQuery . '%');
-                }
-            );
-    }
-
-    public function scopeOffers($query, $nameOfService)
-    {
-        $scope = 'scopeOffers' . ucfirst(strtolower($nameOfService));
-
-        return $this->{$scope}($query);
+        return 'icon';
     }
 
     /*
@@ -716,26 +683,40 @@ class Dealer extends Model
     |-------------------------------------------------------------------------------------------------------------------
     */
 
-    public function resolveRelatedModel()
+    public function setIconAttribute($value)
     {
-        $entitiy = app('App\\' . array_flip(self::$siteIdModels)[$this->site_id]);
-
-        return $entitiy->findOrFail($this->id);
+        if (empty($value)) {
+            $this->attributes['icon'] = null;
+        } else {
+            $this->attributes['icon'] = $value;
+        }
     }
 
-    /**
-     * Gets the corresponding mobile number to @var $nameOfService
-     * This is used when sending SMS messages to a dealer and we
-     * only know the name of the service a lead project wants,
-     * but not which mobile number we should send to
-     * @param $nameOfService
-     * @return mixed
-     */
-    public function getMobileByService($nameOfService)
-    {
-        $field = strtolower($nameOfService) . '_mobile';
+    /*
+    |-------------------------------------------------------------------------------------------------------------------
+    | Scopes
+    |-------------------------------------------------------------------------------------------------------------------
+    */
 
-        return $this->{$field};
+    public function scopeIcon($query, $icon)
+    {
+        return $query->where('icon', '=', $icon);
+    }
+
+    /*
+    |-------------------------------------------------------------------------------------------------------------------
+    | Methods
+    |-------------------------------------------------------------------------------------------------------------------
+    */
+
+    public function hasImage()
+    {
+        return $this->image_id !== 0;
+    }
+
+    public function featuredImage()
+    {
+        return 'defaults/2560x720.jpg';
     }
 
     /*
@@ -744,17 +725,11 @@ class Dealer extends Model
     |-------------------------------------------------------------------------------------------------------------------
     */
 
-    public function site()
+    public function image()
     {
-        return $this->belongsTo(Site::class);
-    }
-
-    public function municipality()
-    {
-        return $this->belongsTo(Municipality::class);
+        return $this->belongsTo(Image::class);
     }
 }
-
 ```
 
 8. Conditional statements VS Switch statements
